@@ -1,1 +1,88 @@
-"Hello World" 
+<!DOCTYPE html>
+<html>
+<head>
+    <title>emilio</title>
+</head>
+<body>
+
+<div>
+    <b>1. Select Image.</b>
+    <br>
+    <input id="img-orig-input" type="file" name="filename" accept="image/gif, image/jpeg, image/png">
+    <br>
+    <img id="img-orig-preview" src="#" alt="" />
+</div>
+
+<br>
+
+<div>
+    <b>2. Pixelate.</b>
+    <br>
+    <button id="pixy-btn">Pixify!</button>
+    <br>
+    <img id="img-orig-pixel" src="#" alt="" />
+</div>
+
+</body>
+
+<script>
+
+    // 1. Load Image
+    let fileTag = document.getElementById("img-orig-input");
+    let preview = document.getElementById("img-orig-preview");
+
+    fileTag.addEventListener("change", function() {
+        previewImage(this);
+    });
+
+    function previewImage(input) {
+      var reader;
+
+      if (input.files && input.files[0]) {
+        reader = new FileReader();
+
+        reader.onload = function(e) {
+          preview.setAttribute('src', e.target.result);
+        }
+
+        reader.readAsDataURL(input.files[0]);
+      }
+    }
+
+    // 2. Pixelate
+    let c = document.createElement("canvas");
+    ctx = c.getContext('2d');
+    let img1 = new Image();
+    var btn = document.getElementById("pixy-btn");
+    btn.onclick = function () {
+
+      img1.src = document.getElementById("img-orig-preview").src;
+
+      w = img1.width;
+      h = img1.height;
+      c.width = w;
+      c.height = h;
+      ctx.drawImage(img1, 0, 0);
+
+      var pixelArr = ctx.getImageData(0, 0, w, h).data; // array of [r,g,b,a,r,g,b,a,..]
+      pixel_size = 20;
+      console.log(pixel_size);
+
+      for (let y = 0; y < h; y += pixel_size) {
+        for (let x = 0; x < w; x += pixel_size) {
+          let p = (x + (y*w)) * 4;
+          ctx.fillStyle = "rgba(" + pixelArr[p] + "," + pixelArr[p + 1] + "," + pixelArr[p + 2] + "," + pixelArr[p + 3] + ")";
+          ctx.fillRect(x, y, pixel_size, pixel_size);
+        }
+      }
+
+      let p = document.getElementById("img-orig-pixel");
+      p.setAttribute('src', c.toDataURL("image/jpeg"));
+
+    };
+
+
+
+</script>
+
+</html>
