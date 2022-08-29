@@ -18,14 +18,15 @@ btn.onclick = function () {
   ctx.drawImage(img1, 0, 0);
 
   pixelArr = ctx.getImageData(0, 0, w, h).data; // array of [r,g,b,a,r,g,b,a,..]
-  pixel_size = 30;
+  pixel_size = 5;
   console.log(pixel_size);
 
   for (let y = 0; y < h; y += pixel_size) {
     for (let x = 0; x < w; x += pixel_size) {
-        // TODO: find nearest color
       let p = (x + (y*w)) * 4;
-      ctx.fillStyle = "rgba(" + pixelArr[p] + "," + pixelArr[p + 1] + "," + pixelArr[p + 2] + "," + pixelArr[p + 3] + ")";
+      let rgb = {r: pixelArr[p], g: pixelArr[p+1], b: pixelArr[p+2]};
+      let closest = getClosestColor(rgb, selectedColors);
+      ctx.fillStyle = "rgba(" + closest.r + "," + closest.g + "," + closest.b + "," + pixelArr[p + 3] + ")";
       ctx.fillRect(x, y, pixel_size, pixel_size);
     }
   }
@@ -57,6 +58,19 @@ function hexToRgb(hex) {
     g: parseInt(result[2], 16),
     b: parseInt(result[3], 16)
   } : null;
+}
+
+function getClosestColor(rgb, colorList) {
+
+    // calculate distance to on all selected colors, compared to current pixel
+    colorList.forEach(color => {
+        color.distance = getColorDistance(rgb, color);
+    });
+    // return closest match
+    return colorList.reduce(function(prev, curr) {
+        return prev.distance < curr.distance ? prev : curr;
+    });
+
 }
 
 function getColorDistance(a, b) {
