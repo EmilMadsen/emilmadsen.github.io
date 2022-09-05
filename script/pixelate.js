@@ -7,19 +7,20 @@ var btn = document.getElementById("pixy-btn");
 btn.onclick = function () {
 
   let selectedColors = getSelectedColors();
-  console.log(selectedColors);
-
   img1.src = document.getElementById("img-orig-preview").src;
 
   w = img1.width;
   h = img1.height;
-  c.width = w;
+
+  let horizontal_pixel_count = document.getElementById('pixel-input').value
+  // size of pixel = orig width / horizontal pixelcount
+  let pixel_size = Math.ceil(w / horizontal_pixel_count);
+  let reduced_width = w - (w % pixel_size);
+
+  c.width = reduced_width;
   c.height = h;
   ctx.drawImage(img1, 0, 0);
-
   pixelArr = ctx.getImageData(0, 0, w, h).data; // array of [r,g,b,a,r,g,b,a,..]
-  pixel_size = 5;
-  console.log(pixel_size);
 
   for (let y = 0; y < h; y += pixel_size) {
     for (let x = 0; x < w; x += pixel_size) {
